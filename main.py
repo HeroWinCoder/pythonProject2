@@ -1,11 +1,12 @@
 import classes.field as field
 import classes.dispenser as dispenser
 
-field = field.Field(100, 100, 2)
-field.add_dispenser(dispenser.Dispenser(3, 3, 1, 100, [10, 1]))
-field.add_dispenser(dispenser.Dispenser(50, 40, 1, 100, [10, 1]))
-field.add_dispenser(dispenser.Dispenser(90, 90, 1, 50, [1, 10]))
-field.set_field_settings(1000, 0.8)
+field = field.Field(5, 5, 2)
+# field.add_dispenser(dispenser.Dispenser([1, 1], 90, 20, [1, 0]))
+# field.add_dispenser(dispenser.Dispenser([1, 18], 30, 20, [0, 1]))
+# field.add_dispenser(dispenser.Dispenser([18, 1], 30, 20, [0, 1]))
+field.add_dispenser(dispenser.Dispenser([3, 3], 30, 20, [1, 0]))
+field.set_field_settings(200, 0.8, 2)
 field.show_field()
 #
 # import numpy as np

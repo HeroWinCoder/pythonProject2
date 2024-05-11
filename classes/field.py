@@ -21,6 +21,7 @@ class Field:
     dispensers = []
     simulation_time = 10
     frame = 0
+    stable_density = 0
 
     def __init__(self, length, width, height):
         self.im = None
@@ -33,20 +34,20 @@ class Field:
     def add_dispenser(self, disp):
         self.dispensers.append(disp)
 
-    def set_field_settings(self, simulation_time, diffusion_rate):
+    def set_field_settings(self, simulation_time, diffusion_rate, stable_density):
         self.simulation_time = simulation_time
         self.diffusion_rate = diffusion_rate
+        self.stable_density = stable_density
 
     def show_field(self):
         fig, ax = plt.subplots(figsize=(8, 8))
-        norm = Normalize(vmin=0, vmax=self.get_max_portion_from_dispensers()*1)
+        norm = Normalize(vmin=0, vmax=self.stable_density*2)
         self.im = ax.imshow(self.grid, cmap=cm.hot, norm=norm, interpolation='nearest')
         fig.colorbar(cm.ScalarMappable(norm=norm, cmap=cm.hot), ax=ax, label='Концентрация аромата')
         ax.set_title(self.GRID_TITLE)
         animation = FuncAnimation(fig, self.update, self.simulation_time, interval=10, repeat=False)
         plt.xlabel(self.X_LABEL)
         plt.ylabel(self.Y_LABEL)
-        plt.text(self.length // 10, 0, self.DESCRIPTION_TEXT, ha='left', wrap=True)
         plt.show()
 
     def get_max_portion_from_dispensers(self):
@@ -56,6 +57,7 @@ class Field:
         return max_portion
 
     def update(self, frame):
+        print("Время: {} сек.".format(self.frame))
         self.spray_dispensers()
         self.save_log_grid_data(self.grid)
         remains_grid = self.get_remains_grid()
@@ -70,7 +72,10 @@ class Field:
         for disp in self.dispensers:
             x_start, x_end = disp.get_x_row(self.grid)
             y_start, y_end = disp.get_y_row(self.grid)
-            self.grid[x_start:x_end, y_start:y_end] += disp.spray(self.frame, self.grid)
+            x_range = slice(x_start, x_end) if x_start != x_end else slice(x_start, x_start+1)
+            y_range = slice(y_start, y_end) if y_start != y_end else slice(y_start, y_start+1)
+            spray_grid = disp.spray(self.frame, self.grid)
+            self.grid[x_range, y_range] += spray_grid
 
     def save_log_grid_data(self, grid):
         with open(self.log_file_name, 'a') as csvfile:
